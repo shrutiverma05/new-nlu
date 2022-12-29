@@ -1,13 +1,34 @@
-version: '3.7'
+version: '3'
 services:
-  nlu:
+   https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '443:443'
+      - '80:80'
+    links:
+      - nlu
+    restart: always
+    environment:
+      DOMAINS: 'uat.nlu.ml.novacept.io -> http://nlu:8080'
+      #STAGE: 'production' # Don't use production until staging works
+      # FORCE_RENEW: 'true'
+    volumes: 
+      - https-portal-data:/var/lib/https-portal
+    networks:
+       - test-network
+
+   nlu:
     build: ./
     volumes:
-      - ./config.yml:/app/config.yml
-      - ./models/:/app/models/
+     - ./config.yml:/app/config.yml
+     - ./models/:/app/models/
     ports:
-      - "8080:8080"
+     - "8080:8080"
     networks:
-      - test-network
+     - test-network
 networks:
   test-network:
+
+volumes:
+  https-portal-data:
+
